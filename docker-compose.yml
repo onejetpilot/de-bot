@@ -1,0 +1,10 @@
+services:
+  bot:
+    build:
+      context: .
+    container_name: de-interview-bot
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

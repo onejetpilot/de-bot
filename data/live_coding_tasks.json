@@ -1,0 +1,602 @@
+[
+  {
+    "id": "py-001-deduplicate-preserve-order",
+    "language": "python",
+    "title": "Удалить дубликаты с сохранением порядка",
+    "prompt": "Напиши функцию unique_preserve_order(items), которая принимает список значений и возвращает новый список без дубликатов, сохраняя порядок первого появления. Пример: [3, 1, 3, 2, 1] -> [3, 1, 2].",
+    "expected_solution": "def unique_preserve_order(items):\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result\n\nСложность: O(n) по времени и O(n) по памяти.",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-002-count-by-day",
+    "language": "python",
+    "title": "Посчитать события по дням",
+    "prompt": "Есть список словарей events, у каждого события есть created_at в ISO-формате: 2026-05-12T10:15:00. Напиши count_by_day(events), которая вернёт словарь {date: count}.",
+    "expected_solution": "from collections import Counter\nfrom datetime import datetime\n\ndef count_by_day(events):\n    counts = Counter()\n    for event in events:\n        dt = datetime.fromisoformat(event['created_at'])\n        counts[dt.date().isoformat()] += 1\n    return dict(counts)",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-003-filter-valid-records",
+    "language": "python",
+    "title": "Отфильтровать валидные записи",
+    "prompt": "Есть records: список словарей с ключами user_id, email, age. Верни только записи, где user_id не пустой, email содержит @, age есть и age >= 18.",
+    "expected_solution": "def filter_valid_records(records):\n    result = []\n    for row in records:\n        if not row.get('user_id'):\n            continue\n        if '@' not in str(row.get('email', '')):\n            continue\n        age = row.get('age')\n        if age is None or age < 18:\n            continue\n        result.append(row)\n    return result",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-004-sum-amount-by-user",
+    "language": "python",
+    "title": "Сумма покупок по пользователям",
+    "prompt": "Есть purchases: список словарей {'user_id': int, 'amount': float}. Напиши функцию sum_by_user(purchases), которая вернёт словарь {user_id: total_amount}.",
+    "expected_solution": "from collections import defaultdict\n\ndef sum_by_user(purchases):\n    totals = defaultdict(float)\n    for purchase in purchases:\n        totals[purchase['user_id']] += purchase.get('amount', 0) or 0\n    return dict(totals)",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-005-parse-json-lines",
+    "language": "python",
+    "title": "Распарсить JSON Lines",
+    "prompt": "Есть список строк lines, каждая строка должна быть JSON-объектом. Напиши parse_json_lines(lines), которая вернёт список словарей и пропустит невалидные JSON-строки.",
+    "expected_solution": "import json\n\ndef parse_json_lines(lines):\n    result = []\n    for line in lines:\n        try:\n            value = json.loads(line)\n        except json.JSONDecodeError:\n            continue\n        if isinstance(value, dict):\n            result.append(value)\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-006-flatten-list",
+    "language": "python",
+    "title": "Развернуть список списков",
+    "prompt": "Напиши функцию flatten(rows), которая принимает список списков и возвращает один плоский список. Пример: [[1, 2], [], [3]] -> [1, 2, 3].",
+    "expected_solution": "def flatten(rows):\n    result = []\n    for row in rows:\n        result.extend(row)\n    return result\n\nМожно также использовать list comprehension: [item for row in rows for item in row].",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-007-top-k-words",
+    "language": "python",
+    "title": "Top K слов",
+    "prompt": "Дан список words. Напиши top_k_words(words, k), которая вернёт k самых частых слов. При равной частоте отсортируй слова лексикографически.",
+    "expected_solution": "from collections import Counter\n\ndef top_k_words(words, k):\n    counts = Counter(words)\n    pairs = sorted(counts.items(), key=lambda item: (-item[1], item[0]))\n    return [word for word, _ in pairs[:k]]",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-008-read-csv-text",
+    "language": "python",
+    "title": "Прочитать CSV из текста",
+    "prompt": "Есть строка csv_text с заголовком: user_id,amount. Напиши read_amounts(csv_text), которая вернёт список словарей и приведёт amount к float.",
+    "expected_solution": "import csv\nfrom io import StringIO\n\ndef read_amounts(csv_text):\n    reader = csv.DictReader(StringIO(csv_text))\n    result = []\n    for row in reader:\n        result.append({\n            'user_id': row['user_id'],\n            'amount': float(row['amount']),\n        })\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-009-find-missing-ids",
+    "language": "python",
+    "title": "Найти отсутствующие ID",
+    "prompt": "Дан список целых id от 1 до n, часть id может отсутствовать. Напиши missing_ids(ids, n), которая вернёт отсортированный список отсутствующих id.",
+    "expected_solution": "def missing_ids(ids, n):\n    existing = set(ids)\n    return [item_id for item_id in range(1, n + 1) if item_id not in existing]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-010-normalize-emails",
+    "language": "python",
+    "title": "Нормализовать email",
+    "prompt": "Есть список email-строк. Напиши normalize_emails(emails), которая убирает пробелы по краям, приводит к нижнему регистру и возвращает только строки с символом @.",
+    "expected_solution": "def normalize_emails(emails):\n    result = []\n    for email in emails:\n        normalized = email.strip().lower()\n        if '@' in normalized:\n            result.append(normalized)\n    return result",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-011-inner-join-lists",
+    "language": "python",
+    "title": "Сделать inner join двух списков",
+    "prompt": "Есть users = [{'id': 1, 'name': 'Ann'}] и orders = [{'id': 10, 'user_id': 1}]. Напиши join_users_orders(users, orders), которая вернёт заказы с именем пользователя только для найденных пользователей.",
+    "expected_solution": "def join_users_orders(users, orders):\n    users_by_id = {user['id']: user for user in users}\n    result = []\n    for order in orders:\n        user = users_by_id.get(order['user_id'])\n        if user is None:\n            continue\n        result.append({**order, 'user_name': user['name']})\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-012-batch-list",
+    "language": "python",
+    "title": "Разбить список на батчи",
+    "prompt": "Напиши функцию batched(items, batch_size), которая возвращает список батчей. Пример: batched([1,2,3,4,5], 2) -> [[1,2], [3,4], [5]].",
+    "expected_solution": "def batched(items, batch_size):\n    if batch_size <= 0:\n        raise ValueError('batch_size must be positive')\n    return [items[i:i + batch_size] for i in range(0, len(items), batch_size)]",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-013-safe-int",
+    "language": "python",
+    "title": "Безопасно привести к int",
+    "prompt": "Напиши safe_int(value, default=None), которая пытается привести value к int, а если не получается, возвращает default.",
+    "expected_solution": "def safe_int(value, default=None):\n    try:\n        return int(value)\n    except (TypeError, ValueError):\n        return default",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-014-latest-record-by-key",
+    "language": "python",
+    "title": "Последняя запись по ключу",
+    "prompt": "Есть records со значениями user_id и updated_at в ISO-формате. Напиши latest_by_user(records), которая вернёт словарь {user_id: latest_record}.",
+    "expected_solution": "from datetime import datetime\n\ndef latest_by_user(records):\n    result = {}\n    for record in records:\n        user_id = record['user_id']\n        updated_at = datetime.fromisoformat(record['updated_at'])\n        current = result.get(user_id)\n        if current is None or updated_at > datetime.fromisoformat(current['updated_at']):\n            result[user_id] = record\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-015-check-required-fields",
+    "language": "python",
+    "title": "Проверить обязательные поля",
+    "prompt": "Напиши validate_required(row, required_fields), которая вернёт список отсутствующих или пустых обязательных полей в словаре row.",
+    "expected_solution": "def validate_required(row, required_fields):\n    missing = []\n    for field in required_fields:\n        if row.get(field) in (None, ''):\n            missing.append(field)\n    return missing",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-001-users-without-orders",
+    "language": "sql",
+    "title": "Пользователи без заказов",
+    "prompt": "Есть таблицы users(id, name) и orders(id, user_id, created_at). Напиши SQL-запрос, который вернёт пользователей, у которых нет ни одного заказа.",
+    "expected_solution": "SELECT u.id, u.name\nFROM users u\nLEFT JOIN orders o ON o.user_id = u.id\nWHERE o.id IS NULL;\n\nТакже корректно через NOT EXISTS.",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-002-total-amount-by-user",
+    "language": "sql",
+    "title": "Сумма заказов по пользователям",
+    "prompt": "Есть orders(id, user_id, amount, created_at). Напиши запрос, который вернёт user_id и сумму amount по каждому пользователю.",
+    "expected_solution": "SELECT user_id, SUM(amount) AS total_amount\nFROM orders\nGROUP BY user_id;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-003-orders-last-7-days",
+    "language": "sql",
+    "title": "Заказы за последние 7 дней",
+    "prompt": "Есть orders(id, user_id, created_at). Напиши запрос, который вернёт заказы за последние 7 дней.",
+    "expected_solution": "SELECT id, user_id, created_at\nFROM orders\nWHERE created_at >= CURRENT_DATE - INTERVAL '7 days';\n\nСинтаксис интервала может немного отличаться в разных СУБД.",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-004-count-events-by-day",
+    "language": "sql",
+    "title": "Количество событий по дням",
+    "prompt": "Есть events(id, user_id, event_time). Посчитай количество событий по каждому дню.",
+    "expected_solution": "SELECT CAST(event_time AS DATE) AS event_date, COUNT(*) AS events_count\nFROM events\nGROUP BY CAST(event_time AS DATE)\nORDER BY event_date;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-005-unique-users-by-day",
+    "language": "sql",
+    "title": "Уникальные пользователи по дням",
+    "prompt": "Есть events(user_id, event_time). Напиши запрос, который посчитает количество уникальных пользователей по дням.",
+    "expected_solution": "SELECT CAST(event_time AS DATE) AS event_date, COUNT(DISTINCT user_id) AS users_count\nFROM events\nGROUP BY CAST(event_time AS DATE)\nORDER BY event_date;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-006-where-vs-having-practice",
+    "language": "sql",
+    "title": "Пользователи с двумя и более заказами",
+    "prompt": "Есть orders(id, user_id). Напиши запрос, который вернёт user_id пользователей, у которых 2 или больше заказов.",
+    "expected_solution": "SELECT user_id\nFROM orders\nGROUP BY user_id\nHAVING COUNT(*) >= 2;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-007-left-join-users-orders",
+    "language": "sql",
+    "title": "Все пользователи и число заказов",
+    "prompt": "Есть users(id, name) и orders(id, user_id). Верни всех пользователей и количество их заказов, включая пользователей без заказов.",
+    "expected_solution": "SELECT u.id, u.name, COUNT(o.id) AS orders_count\nFROM users u\nLEFT JOIN orders o ON o.user_id = u.id\nGROUP BY u.id, u.name;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-008-first-order-per-user",
+    "language": "sql",
+    "title": "Первый заказ пользователя",
+    "prompt": "Есть orders(id, user_id, created_at). Верни первый заказ каждого пользователя по created_at.",
+    "expected_solution": "WITH ranked AS (\n    SELECT id, user_id, created_at,\n           ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at, id) AS rn\n    FROM orders\n)\nSELECT id, user_id, created_at\nFROM ranked\nWHERE rn = 1;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-009-duplicate-emails",
+    "language": "sql",
+    "title": "Найти дубли email",
+    "prompt": "Есть users(id, email). Напиши запрос, который вернёт email, встречающиеся больше одного раза.",
+    "expected_solution": "SELECT email, COUNT(*) AS cnt\nFROM users\nGROUP BY email\nHAVING COUNT(*) > 1;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-010-null-values",
+    "language": "sql",
+    "title": "Найти строки с пустым email",
+    "prompt": "Есть users(id, email). Верни строки, где email отсутствует: NULL или пустая строка.",
+    "expected_solution": "SELECT id, email\nFROM users\nWHERE email IS NULL OR email = '';",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-011-conversion-simple",
+    "language": "sql",
+    "title": "Простая конверсия визит -> покупка",
+    "prompt": "Есть visits(user_id) и purchases(user_id). Посчитай долю уникальных посетителей, у которых есть хотя бы одна покупка.",
+    "expected_solution": "WITH v AS (\n    SELECT DISTINCT user_id FROM visits\n),\np AS (\n    SELECT DISTINCT user_id FROM purchases\n)\nSELECT COUNT(p.user_id) * 1.0 / NULLIF(COUNT(v.user_id), 0) AS conversion\nFROM v\nLEFT JOIN p ON p.user_id = v.user_id;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-012-max-order-by-user",
+    "language": "sql",
+    "title": "Максимальный заказ пользователя",
+    "prompt": "Есть orders(user_id, amount). Верни user_id и максимальную сумму заказа для каждого пользователя.",
+    "expected_solution": "SELECT user_id, MAX(amount) AS max_amount\nFROM orders\nGROUP BY user_id;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-013-events-with-user-name",
+    "language": "sql",
+    "title": "События с именем пользователя",
+    "prompt": "Есть events(id, user_id, event_name) и users(id, name). Верни event id, event_name и name пользователя только для событий, где пользователь найден.",
+    "expected_solution": "SELECT e.id, e.event_name, u.name\nFROM events e\nINNER JOIN users u ON u.id = e.user_id;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-014-last-event-per-user",
+    "language": "sql",
+    "title": "Последнее событие пользователя",
+    "prompt": "Есть events(id, user_id, event_time). Верни последнее событие каждого пользователя.",
+    "expected_solution": "WITH ranked AS (\n    SELECT id, user_id, event_time,\n           ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_time DESC, id DESC) AS rn\n    FROM events\n)\nSELECT id, user_id, event_time\nFROM ranked\nWHERE rn = 1;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-015-orders-by-status",
+    "language": "sql",
+    "title": "Заказы по статусам",
+    "prompt": "Есть orders(id, status). Посчитай количество заказов в каждом статусе и отсортируй по количеству по убыванию.",
+    "expected_solution": "SELECT status, COUNT(*) AS orders_count\nFROM orders\nGROUP BY status\nORDER BY orders_count DESC;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-016-squares-list-comprehension",
+    "language": "python",
+    "title": "Квадраты чисел через list comprehension",
+    "prompt": "Напиши list comprehension, который создаёт список квадратов чисел от 1 до 5.",
+    "expected_solution": "squares = [x ** 2 for x in range(1, 6)]\n# результат: [1, 4, 9, 16, 25]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-017-palindrome",
+    "language": "python",
+    "title": "Проверить палиндром",
+    "prompt": "Напиши функцию is_palindrome(text), которая возвращает True, если строка является палиндромом. Пробелы и регистр можно игнорировать.",
+    "expected_solution": "def is_palindrome(text):\n    normalized = ''.join(ch.lower() for ch in text if not ch.isspace())\n    return normalized == normalized[::-1]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-018-count-words",
+    "language": "python",
+    "title": "Посчитать слова в строке",
+    "prompt": "Напиши функцию count_words(text), которая возвращает количество слов в строке. Слова разделены пробельными символами.",
+    "expected_solution": "def count_words(text):\n    return len(text.split())",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-019-filter-even-numbers",
+    "language": "python",
+    "title": "Оставить только чётные числа",
+    "prompt": "Есть список nums = [1, 2, 3, 4, 5]. Напиши код, который вернёт только чётные числа.",
+    "expected_solution": "nums = [1, 2, 3, 4, 5]\neven_nums = [num for num in nums if num % 2 == 0]\n# результат: [2, 4]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-020-even-squares",
+    "language": "python",
+    "title": "Чётные квадраты",
+    "prompt": "Напиши list comprehension, который для чисел от 1 до 10 вернёт квадраты только чётных чисел.",
+    "expected_solution": "even_squares = [x ** 2 for x in range(1, 11) if x % 2 == 0]\n# результат: [4, 16, 36, 64, 100]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-021-pandas-filter-rows",
+    "language": "python",
+    "title": "Отфильтровать строки DataFrame",
+    "prompt": "Есть pandas DataFrame df с колонкой amount. Напиши код, который оставит только строки, где amount > 100.",
+    "expected_solution": "filtered = df[df['amount'] > 100]",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-022-pandas-groupby-sum",
+    "language": "python",
+    "title": "Сумма в pandas по группам",
+    "prompt": "Есть DataFrame df с колонками user_id и amount. Напиши код, который посчитает сумму amount по каждому user_id.",
+    "expected_solution": "result = df.groupby('user_id', as_index=False)['amount'].sum()",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-023-pandas-merge",
+    "language": "python",
+    "title": "Объединить два DataFrame",
+    "prompt": "Есть users с колонкой id и orders с колонкой user_id. Напиши pandas-код для inner join заказов с пользователями.",
+    "expected_solution": "result = orders.merge(users, left_on='user_id', right_on='id', how='inner')",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-024-pandas-read-csv-chunks",
+    "language": "python",
+    "title": "Читать большой CSV частями",
+    "prompt": "Напиши пример pandas-кода, который читает большой CSV-файл частями по 10000 строк.",
+    "expected_solution": "import pandas as pd\n\nfor chunk in pd.read_csv('data.csv', chunksize=10000):\n    # обработка chunk\n    pass",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-025-pandas-to-parquet",
+    "language": "python",
+    "title": "Сохранить DataFrame в parquet",
+    "prompt": "Есть DataFrame df. Напиши код, который сохраняет его в parquet-файл data.parquet.",
+    "expected_solution": "df.to_parquet('data.parquet', index=False)",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-016-employees-above-average-salary",
+    "language": "sql",
+    "title": "Сотрудники с зарплатой выше средней",
+    "prompt": "Есть таблица employees(id, name, salary). Напиши запрос, который вернёт сотрудников с зарплатой выше средней по таблице.",
+    "expected_solution": "SELECT id, name, salary\nFROM employees\nWHERE salary > (SELECT AVG(salary) FROM employees);",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-017-count-orders-by-user",
+    "language": "sql",
+    "title": "Количество заказов по пользователям",
+    "prompt": "Есть таблица orders(id, user_id). Напиши запрос для подсчёта количества заказов у каждого пользователя.",
+    "expected_solution": "SELECT user_id, COUNT(*) AS orders_count\nFROM orders\nGROUP BY user_id;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-018-top-3-products-by-price",
+    "language": "sql",
+    "title": "Топ-3 самых дорогих товара",
+    "prompt": "Есть таблица products(id, name, price). Напиши запрос, который вернёт топ-3 самых дорогих товара.",
+    "expected_solution": "SELECT id, name, price\nFROM products\nORDER BY price DESC\nLIMIT 3;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-019-second-highest-salary",
+    "language": "sql",
+    "title": "Вторая по величине зарплата",
+    "prompt": "Есть таблица employees(id, name, salary). Напиши SQL-запрос для поиска второго по величине salary.",
+    "expected_solution": "SELECT MAX(salary) AS second_highest_salary\nFROM employees\nWHERE salary < (SELECT MAX(salary) FROM employees);\n\nЕсли нужно учитывать дубли и ранги, можно использовать DENSE_RANK().",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-020-sales-sum-by-day",
+    "language": "sql",
+    "title": "Сумма продаж по дням",
+    "prompt": "Есть таблица sales(id, amount, sale_date). Напиши запрос для подсчёта суммы продаж по дням.",
+    "expected_solution": "SELECT CAST(sale_date AS DATE) AS sale_day, SUM(amount) AS total_amount\nFROM sales\nGROUP BY CAST(sale_date AS DATE)\nORDER BY sale_day;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-026-deduplicate-events-by-id",
+    "language": "python",
+    "title": "Дедуплицировать события по id",
+    "prompt": "Есть список событий events, у каждого есть event_id и updated_at в ISO-формате. Напиши deduplicate_events(events), которая оставит по одному событию на event_id: самое позднее по updated_at.",
+    "expected_solution": "from datetime import datetime\n\ndef deduplicate_events(events):\n    latest = {}\n    for event in events:\n        event_id = event['event_id']\n        updated_at = datetime.fromisoformat(event['updated_at'])\n        if event_id not in latest or updated_at > datetime.fromisoformat(latest[event_id]['updated_at']):\n            latest[event_id] = event\n    return list(latest.values())",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-027-window-moving-average",
+    "language": "python",
+    "title": "Скользящее среднее",
+    "prompt": "Дан список чисел values и размер окна window. Напиши moving_average(values, window), которая вернёт список средних значений для каждого полного окна.",
+    "expected_solution": "def moving_average(values, window):\n    if window <= 0:\n        raise ValueError('window must be positive')\n    result = []\n    current_sum = 0\n    for index, value in enumerate(values):\n        current_sum += value\n        if index >= window:\n            current_sum -= values[index - window]\n        if index >= window - 1:\n            result.append(current_sum / window)\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-028-merge-incremental-records",
+    "language": "python",
+    "title": "Смерджить инкрементальные записи",
+    "prompt": "Есть old_rows и new_rows: списки словарей с ключом id. Напиши merge_by_id(old_rows, new_rows), где новые записи заменяют старые с тем же id, а отсутствующие добавляются.",
+    "expected_solution": "def merge_by_id(old_rows, new_rows):\n    by_id = {row['id']: row for row in old_rows}\n    for row in new_rows:\n        by_id[row['id']] = row\n    return list(by_id.values())",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-029-detect-schema-drift",
+    "language": "python",
+    "title": "Найти drift схемы",
+    "prompt": "Есть expected_columns и actual_columns. Напиши detect_schema_drift(expected_columns, actual_columns), которая вернёт словарь с missing и extra колонками.",
+    "expected_solution": "def detect_schema_drift(expected_columns, actual_columns):\n    expected = set(expected_columns)\n    actual = set(actual_columns)\n    return {\n        'missing': sorted(expected - actual),\n        'extra': sorted(actual - expected),\n    }",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-030-sessionize-events",
+    "language": "python",
+    "title": "Разбить события на сессии",
+    "prompt": "Есть события одного пользователя events, отсортированные по created_at. Напиши add_session_numbers(events, timeout_minutes=30), которая добавит session_number, увеличивая его при разрыве больше timeout_minutes.",
+    "expected_solution": "from datetime import datetime, timedelta\n\ndef add_session_numbers(events, timeout_minutes=30):\n    timeout = timedelta(minutes=timeout_minutes)\n    result = []\n    session_number = 0\n    previous_time = None\n    for event in events:\n        current_time = datetime.fromisoformat(event['created_at'])\n        if previous_time is None or current_time - previous_time > timeout:\n            session_number += 1\n        row = dict(event)\n        row['session_number'] = session_number\n        result.append(row)\n        previous_time = current_time\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-031-build-scd2-record",
+    "language": "python",
+    "title": "Подготовить SCD2-записи",
+    "prompt": "Есть current_row и changed_row для одного business_key. Напиши build_scd2_update(current_row, changed_row, changed_at), которая закрывает текущую запись valid_to и создаёт новую с valid_from, valid_to=None, is_current=True.",
+    "expected_solution": "def build_scd2_update(current_row, changed_row, changed_at):\n    closed = dict(current_row)\n    closed['valid_to'] = changed_at\n    closed['is_current'] = False\n\n    new_record = dict(changed_row)\n    new_record['valid_from'] = changed_at\n    new_record['valid_to'] = None\n    new_record['is_current'] = True\n    return closed, new_record",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-032-validate-unique-key",
+    "language": "python",
+    "title": "Проверить уникальность ключа",
+    "prompt": "Есть rows и key. Напиши find_duplicate_keys(rows, key), которая вернёт отсортированный список значений key, встретившихся больше одного раза.",
+    "expected_solution": "from collections import Counter\n\ndef find_duplicate_keys(rows, key):\n    counts = Counter(row.get(key) for row in rows)\n    return sorted(value for value, count in counts.items() if value is not None and count > 1)",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-033-pivot-metrics",
+    "language": "python",
+    "title": "Развернуть метрики в wide-формат",
+    "prompt": "Есть rows вида {'user_id': 1, 'metric': 'clicks', 'value': 10}. Напиши pivot_metrics(rows), которая вернёт по одной записи на user_id с колонками-метриками.",
+    "expected_solution": "from collections import defaultdict\n\ndef pivot_metrics(rows):\n    result = defaultdict(dict)\n    for row in rows:\n        user_id = row['user_id']\n        result[user_id]['user_id'] = user_id\n        result[user_id][row['metric']] = row['value']\n    return list(result.values())",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-034-parse-log-levels",
+    "language": "python",
+    "title": "Посчитать уровни логов",
+    "prompt": "Есть список строк логов, где уровень записан вторым токеном: '2026-05-14 ERROR message'. Напиши count_log_levels(lines), которая вернёт количество INFO/WARN/ERROR.",
+    "expected_solution": "from collections import Counter\n\ndef count_log_levels(lines):\n    counts = Counter()\n    for line in lines:\n        parts = line.split(maxsplit=2)\n        if len(parts) >= 2 and parts[1] in {'INFO', 'WARN', 'ERROR'}:\n            counts[parts[1]] += 1\n    return dict(counts)",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-035-watermark-filter",
+    "language": "python",
+    "title": "Отфильтровать записи по watermark",
+    "prompt": "Есть rows с updated_at в ISO-формате и last_watermark. Напиши filter_after_watermark(rows, last_watermark), которая вернёт только записи с updated_at строго позже watermark.",
+    "expected_solution": "from datetime import datetime\n\ndef filter_after_watermark(rows, last_watermark):\n    watermark = datetime.fromisoformat(last_watermark)\n    return [\n        row for row in rows\n        if datetime.fromisoformat(row['updated_at']) > watermark\n    ]",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-036-generate-date-partitions",
+    "language": "python",
+    "title": "Сгенерировать даты партиций",
+    "prompt": "Даны start_date и end_date в формате YYYY-MM-DD. Напиши date_partitions(start_date, end_date), которая вернёт список дат включительно.",
+    "expected_solution": "from datetime import date, timedelta\n\ndef date_partitions(start_date, end_date):\n    current = date.fromisoformat(start_date)\n    end = date.fromisoformat(end_date)\n    result = []\n    while current <= end:\n        result.append(current.isoformat())\n        current += timedelta(days=1)\n    return result",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-037-safe-get-nested",
+    "language": "python",
+    "title": "Безопасно достать вложенное значение",
+    "prompt": "Напиши get_nested(data, path, default=None), где path — список ключей. Функция должна безопасно вернуть вложенное значение из словаря или default.",
+    "expected_solution": "def get_nested(data, path, default=None):\n    current = data\n    for key in path:\n        if not isinstance(current, dict) or key not in current:\n            return default\n        current = current[key]\n    return current",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-038-anomaly-detect-negative-amounts",
+    "language": "python",
+    "title": "Найти отрицательные суммы",
+    "prompt": "Есть rows с полем amount. Напиши find_negative_amounts(rows), которая вернёт строки, где amount меньше 0, игнорируя None и отсутствующие значения.",
+    "expected_solution": "def find_negative_amounts(rows):\n    result = []\n    for row in rows:\n        amount = row.get('amount')\n        if amount is not None and amount < 0:\n            result.append(row)\n    return result",
+    "difficulty": "intern"
+  },
+  {
+    "id": "py-039-group-events-by-hour",
+    "language": "python",
+    "title": "Сгруппировать события по часу",
+    "prompt": "Есть events с created_at в ISO-формате. Напиши count_by_hour(events), которая вернёт словарь {'YYYY-MM-DD HH:00:00': count}.",
+    "expected_solution": "from collections import Counter\nfrom datetime import datetime\n\ndef count_by_hour(events):\n    counts = Counter()\n    for event in events:\n        dt = datetime.fromisoformat(event['created_at']).replace(minute=0, second=0, microsecond=0)\n        counts[dt.strftime('%Y-%m-%d %H:%M:%S')] += 1\n    return dict(counts)",
+    "difficulty": "junior"
+  },
+  {
+    "id": "py-040-build-upsert-payload",
+    "language": "python",
+    "title": "Подготовить payload для upsert",
+    "prompt": "Есть rows и список columns. Напиши build_upsert_payload(rows, columns), которая оставит в каждой строке только нужные columns и пропустит строки без id.",
+    "expected_solution": "def build_upsert_payload(rows, columns):\n    result = []\n    for row in rows:\n        if not row.get('id'):\n            continue\n        result.append({column: row.get(column) for column in columns})\n    return result",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-021-orders-with-row-number",
+    "language": "sql",
+    "title": "Пронумеровать заказы пользователя",
+    "prompt": "Есть orders(id, user_id, created_at). Напиши запрос, который вернёт заказы и номер заказа пользователя по created_at.",
+    "expected_solution": "SELECT\n  id,\n  user_id,\n  created_at,\n  ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at) AS order_number\nFROM orders;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-022-latest-record-by-user",
+    "language": "sql",
+    "title": "Последняя запись пользователя",
+    "prompt": "Есть events(id, user_id, event_name, created_at). Напиши запрос, который вернёт последнюю запись для каждого user_id.",
+    "expected_solution": "WITH ranked AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at DESC) AS rn\n  FROM events\n)\nSELECT id, user_id, event_name, created_at\nFROM ranked\nWHERE rn = 1;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-023-users-no-events-last-30-days",
+    "language": "sql",
+    "title": "Пользователи без событий за 30 дней",
+    "prompt": "Есть users(id) и events(user_id, created_at). Напиши запрос, который вернёт пользователей без событий за последние 30 дней.",
+    "expected_solution": "SELECT u.id\nFROM users u\nLEFT JOIN events e\n  ON e.user_id = u.id\n  AND e.created_at >= CURRENT_DATE - INTERVAL '30 days'\nWHERE e.user_id IS NULL;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-024-conversion-by-day",
+    "language": "sql",
+    "title": "Конверсия по дням",
+    "prompt": "Есть events(user_id, event_name, created_at), где event_name бывает 'visit' и 'purchase'. Посчитай по дням visits, purchases и conversion_rate.",
+    "expected_solution": "SELECT\n  CAST(created_at AS DATE) AS event_day,\n  COUNT(*) FILTER (WHERE event_name = 'visit') AS visits,\n  COUNT(*) FILTER (WHERE event_name = 'purchase') AS purchases,\n  COUNT(*) FILTER (WHERE event_name = 'purchase')::DECIMAL / NULLIF(COUNT(*) FILTER (WHERE event_name = 'visit'), 0) AS conversion_rate\nFROM events\nGROUP BY CAST(created_at AS DATE)\nORDER BY event_day;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-025-deduplicate-by-updated-at",
+    "language": "sql",
+    "title": "Дедупликация по updated_at",
+    "prompt": "Есть raw_orders(order_id, status, updated_at). Напиши запрос, который оставит одну последнюю запись на каждый order_id.",
+    "expected_solution": "WITH ranked AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY updated_at DESC) AS rn\n  FROM raw_orders\n)\nSELECT order_id, status, updated_at\nFROM ranked\nWHERE rn = 1;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-026-running-total-sales",
+    "language": "sql",
+    "title": "Накопительная сумма продаж",
+    "prompt": "Есть sales(id, sale_date, amount). Напиши запрос, который вернёт продажи по дням и накопительную сумму amount.",
+    "expected_solution": "WITH daily AS (\n  SELECT CAST(sale_date AS DATE) AS sale_day, SUM(amount) AS daily_amount\n  FROM sales\n  GROUP BY CAST(sale_date AS DATE)\n)\nSELECT\n  sale_day,\n  daily_amount,\n  SUM(daily_amount) OVER (ORDER BY sale_day) AS running_total\nFROM daily\nORDER BY sale_day;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-027-retention-next-day",
+    "language": "sql",
+    "title": "Retention на следующий день",
+    "prompt": "Есть events(user_id, created_at). Посчитай по дню, сколько пользователей вернулись на следующий день после активности.",
+    "expected_solution": "WITH user_days AS (\n  SELECT DISTINCT user_id, CAST(created_at AS DATE) AS event_day\n  FROM events\n)\nSELECT\n  d1.event_day,\n  COUNT(DISTINCT d1.user_id) AS active_users,\n  COUNT(DISTINCT d2.user_id) AS retained_next_day\nFROM user_days d1\nLEFT JOIN user_days d2\n  ON d2.user_id = d1.user_id\n  AND d2.event_day = d1.event_day + INTERVAL '1 day'\nGROUP BY d1.event_day\nORDER BY d1.event_day;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-028-find-gaps-in-daily-loads",
+    "language": "sql",
+    "title": "Найти пропуски ежедневных загрузок",
+    "prompt": "Есть load_log(load_date). Напиши запрос PostgreSQL, который найдёт даты за последние 7 дней, отсутствующие в load_log.",
+    "expected_solution": "WITH expected_dates AS (\n  SELECT generate_series(CURRENT_DATE - INTERVAL '6 days', CURRENT_DATE, INTERVAL '1 day')::DATE AS load_date\n)\nSELECT e.load_date\nFROM expected_dates e\nLEFT JOIN load_log l ON l.load_date = e.load_date\nWHERE l.load_date IS NULL\nORDER BY e.load_date;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-029-null-rate-by-column",
+    "language": "sql",
+    "title": "Доля NULL в колонках",
+    "prompt": "Есть таблица users(id, email, phone). Напиши запрос, который посчитает долю NULL для email и phone.",
+    "expected_solution": "SELECT\n  AVG(CASE WHEN email IS NULL THEN 1.0 ELSE 0.0 END) AS email_null_rate,\n  AVG(CASE WHEN phone IS NULL THEN 1.0 ELSE 0.0 END) AS phone_null_rate\nFROM users;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-030-scd2-current-records",
+    "language": "sql",
+    "title": "Текущие записи SCD2",
+    "prompt": "Есть dim_users(user_id, name, valid_from, valid_to, is_current). Напиши запрос, который вернёт текущую версию каждого пользователя.",
+    "expected_solution": "SELECT user_id, name, valid_from, valid_to\nFROM dim_users\nWHERE is_current = TRUE;\n\nЕсли флага нет, часто используют условие valid_to IS NULL.",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-031-orders-above-user-average",
+    "language": "sql",
+    "title": "Заказы выше среднего пользователя",
+    "prompt": "Есть orders(id, user_id, amount). Напиши запрос, который вернёт заказы, где amount выше среднего amount этого же пользователя.",
+    "expected_solution": "SELECT id, user_id, amount\nFROM (\n  SELECT\n    orders.*,\n    AVG(amount) OVER (PARTITION BY user_id) AS avg_user_amount\n  FROM orders\n) t\nWHERE amount > avg_user_amount;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-032-top-category-per-day",
+    "language": "sql",
+    "title": "Топ категория по выручке за день",
+    "prompt": "Есть sales(sale_date, category, amount). Напиши запрос, который для каждого дня вернёт категорию с максимальной выручкой.",
+    "expected_solution": "WITH daily AS (\n  SELECT CAST(sale_date AS DATE) AS sale_day, category, SUM(amount) AS revenue\n  FROM sales\n  GROUP BY CAST(sale_date AS DATE), category\n), ranked AS (\n  SELECT\n    *,\n    ROW_NUMBER() OVER (PARTITION BY sale_day ORDER BY revenue DESC) AS rn\n  FROM daily\n)\nSELECT sale_day, category, revenue\nFROM ranked\nWHERE rn = 1;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-033-incremental-load-watermark",
+    "language": "sql",
+    "title": "Инкрементальная загрузка по watermark",
+    "prompt": "Есть source_orders(id, updated_at) и etl_state(pipeline_name, last_watermark). Напиши запрос, который выберет записи source_orders новее watermark для pipeline 'orders'.",
+    "expected_solution": "SELECT s.*\nFROM source_orders s\nJOIN etl_state st ON st.pipeline_name = 'orders'\nWHERE s.updated_at > st.last_watermark;",
+    "difficulty": "junior"
+  },
+  {
+    "id": "sql-034-users-with-only-one-order",
+    "language": "sql",
+    "title": "Пользователи ровно с одним заказом",
+    "prompt": "Есть orders(id, user_id). Напиши запрос, который вернёт user_id пользователей, у которых ровно один заказ.",
+    "expected_solution": "SELECT user_id\nFROM orders\nGROUP BY user_id\nHAVING COUNT(*) = 1;",
+    "difficulty": "intern"
+  },
+  {
+    "id": "sql-035-anti-join-missing-dim",
+    "language": "sql",
+    "title": "Факты без записи в справочнике",
+    "prompt": "Есть fact_orders(order_id, user_id) и dim_users(user_id). Напиши запрос, который найдёт заказы, у которых user_id отсутствует в dim_users.",
+    "expected_solution": "SELECT f.*\nFROM fact_orders f\nLEFT JOIN dim_users d ON d.user_id = f.user_id\nWHERE d.user_id IS NULL;",
+    "difficulty": "junior"
+  }
+]
