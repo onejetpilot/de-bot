@@ -22,18 +22,6 @@ class Settings(BaseSettings):
         default=BASE_DIR / "data" / "questions.md",
         alias="QUESTIONS_FILE",
     )
-    generated_questions_file: Path = Field(
-        default=BASE_DIR / "data" / "generated_questions.json",
-        alias="GENERATED_QUESTIONS_FILE",
-    )
-    interview_results_file: Path = Field(
-        default=BASE_DIR / "data" / "interview_results.json",
-        alias="INTERVIEW_RESULTS_FILE",
-    )
-    answer_cache_file: Path = Field(
-        default=BASE_DIR / "data" / "answer_cache.json",
-        alias="ANSWER_CACHE_FILE",
-    )
     live_coding_tasks_file: Path = Field(
         default=BASE_DIR / "data" / "live_coding_tasks.json",
         alias="LIVE_CODING_TASKS_FILE",

@@ -31,13 +31,8 @@ class ServicesMiddleware(BaseMiddleware):
 
 def build_dispatcher() -> Dispatcher:
     settings = get_settings()
-    storage = SQLiteStorage(
-        settings.database_file,
-        settings.generated_questions_file,
-        settings.interview_results_file,
-        settings.answer_cache_file,
-    )
-    loader = QuestionLoader(settings.questions_file, storage)
+    storage = SQLiteStorage(settings.database_file)
+    loader = QuestionLoader(settings.questions_file)
     explainer = AnswerExplainer(
         settings.openai_api_key,
         settings.openai_base_url,

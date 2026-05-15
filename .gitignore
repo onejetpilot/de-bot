@@ -13,6 +13,3 @@ bot.err.log
 *.sqlite-shm
 *.sqlite3-wal
 *.sqlite3-shm
-data/answer_cache.json
-data/generated_questions.json
-data/interview_results.json

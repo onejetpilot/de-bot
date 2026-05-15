@@ -35,7 +35,8 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4o-mini
 INTERVIEW_QUESTION_COUNT=50
 DATABASE_FILE=data/bot.sqlite3
-ANSWER_CACHE_FILE=data/answer_cache.json
+QUESTIONS_FILE=data/questions.md
+LIVE_CODING_TASKS_FILE=data/live_coding_tasks.json
 ```
 
 Для совместимого LLM API поменяй `OPENAI_BASE_URL` и `OPENAI_MODEL`.
@@ -89,9 +90,7 @@ docker compose down
 ## Хранение данных
 
 - `data/bot.sqlite3` — основная SQLite-база бота
-- `data/generated_questions.json` — legacy-файл дополнительных вопросов для первичной миграции
-- `data/interview_results.json` — legacy-файл завершённых интервью для первичной миграции
-- `data/answer_cache.json` — legacy-файл кэша ответов для первичной миграции
+- `data/questions.md` — база вопросов для интервью
 - `data/live_coding_tasks.json` — лайфкодинг-задачи по Python и SQL для стажёра/джуна Data Engineer
 
-SQLite выбран как лёгкое хранилище без отдельного сервера. При первом запуске бот импортирует существующие JSON-файлы в базу, а дальше работает с таблицами.
+SQLite выбран как лёгкое хранилище без отдельного сервера. В базе сохраняются история интервью и кэш разборов ответов, а вопросы и лайфкодинг-задачи хранятся в файлах из директории `data/`.
