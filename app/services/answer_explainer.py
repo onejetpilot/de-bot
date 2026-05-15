@@ -35,7 +35,9 @@ class AnswerExplainer:
                         "role": "system",
                         "content": (
                             "Ты опытный Data Engineer-интервьюер. "
-                            "Готовь эталонный разбор вопроса строго в JSON без markdown."
+                            "Готовь эталонный разбор вопроса строго в JSON без markdown. "
+                            "Всегда отвечай на русском языке, кроме SQL, Python-кода, команд, "
+                            "названий технологий и общепринятых терминов."
                         ),
                     },
                     {"role": "user", "content": self._build_prompt(question)},
@@ -72,7 +74,9 @@ class AnswerExplainer:
 }}
 
 Правила:
+- все текстовые поля должны быть на русском языке, кроме кода, команд, SQL и названий технологий;
 - correct_answer должен быть стабильным эталоном для повторного использования;
+- если ответ из базы отсутствует, обязательно сформируй correct_answer сам;
 - key_points перечисляют, что обязательно должно быть в хорошем ответе;
 - hints помогают пользователю вспомнить ответ, но не раскрывают его полностью;
 - usage_example оставь пустым только если практический пример действительно неуместен.
@@ -86,10 +90,12 @@ class AnswerExplainer:
     ) -> AnswerExplanation:
         correct_answer = str(data.get("correct_answer") or question.expected_answer or "").strip()
         usage_example = str(data.get("usage_example") or "").strip()
+        if correct_answer == SQLiteStorage.MISSING_ANSWER:
+            correct_answer = ""
         if not usage_example:
             usage_example = cls._default_usage_example(question)
         return AnswerExplanation(
-            correct_answer=correct_answer or "Эталонный ответ отсутствует в базе.",
+            correct_answer=correct_answer or SQLiteStorage.MISSING_ANSWER,
             usage_example=usage_example,
             key_points=cls._normalize_string_list(data.get("key_points")),
             hints=cls._normalize_string_list(data.get("hints")),
@@ -98,7 +104,7 @@ class AnswerExplainer:
     @classmethod
     def _fallback_explanation(cls, question: Question) -> AnswerExplanation:
         return AnswerExplanation(
-            correct_answer=question.expected_answer or "Эталонный ответ отсутствует в базе.",
+            correct_answer=question.expected_answer or SQLiteStorage.MISSING_ANSWER,
             usage_example=cls._default_usage_example(question),
             key_points=[],
             hints=[],

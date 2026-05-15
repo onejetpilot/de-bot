@@ -13,6 +13,8 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class SQLiteStorage:
+    MISSING_ANSWER = "Эталонный ответ отсутствует в базе."
+
     def __init__(self, database_file: Path) -> None:
         self.database_file = database_file
         self.database_file.parent.mkdir(parents=True, exist_ok=True)
@@ -60,6 +62,8 @@ class SQLiteStorage:
             return None
         correct_answer = str(row["correct_answer"] or "").strip()
         usage_example = str(row["usage_example"] or "").strip()
+        if self._is_stale_answer_explanation(question.question, correct_answer):
+            return None
         if not correct_answer and not usage_example:
             return None
         return AnswerExplanation(
@@ -72,6 +76,8 @@ class SQLiteStorage:
     def save_answer_explanation(self, question: Question, explanation: AnswerExplanation) -> None:
         correct_answer = explanation.correct_answer.strip()
         usage_example = explanation.usage_example.strip()
+        if self._is_stale_answer_explanation(question.question, correct_answer):
+            return
         if not correct_answer and not usage_example:
             return
         with self._connect() as conn:
@@ -174,6 +180,18 @@ class SQLiteStorage:
         if not isinstance(value, list):
             return []
         return [str(item).strip() for item in value if str(item).strip()]
+
+    @classmethod
+    def _is_stale_answer_explanation(cls, question: str, correct_answer: str) -> bool:
+        if not correct_answer or correct_answer == cls.MISSING_ANSWER:
+            return True
+        if cls._has_cyrillic(question) and not cls._has_cyrillic(correct_answer):
+            return True
+        return False
+
+    @staticmethod
+    def _has_cyrillic(value: str) -> bool:
+        return any("а" <= char.lower() <= "я" or char.lower() == "ё" for char in value)
 
     @classmethod
     def _answer_cache_key(cls, question: Question) -> str:
