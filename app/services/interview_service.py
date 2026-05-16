@@ -222,9 +222,6 @@ class InterviewService:
             "",
             f"Правильный ответ:\n{record.evaluation.correct_answer}",
         ]
-        if not record.evaluation.is_correct and record.evaluation.hints:
-            hints = "\n".join(f"- {hint}" for hint in record.evaluation.hints[:3])
-            lines.extend(["", f"Подсказки на будущее:\n{hints}"])
         if record.evaluation.usage_example:
             lines.extend(["", f"Пример использования:\n{record.evaluation.usage_example}"])
         return "\n".join(lines)

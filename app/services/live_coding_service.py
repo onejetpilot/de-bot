@@ -83,9 +83,6 @@ class LiveCodingService:
             "",
             f"Один из правильных вариантов:\n{evaluation.correct_answer}",
         ]
-        if not evaluation.is_correct and evaluation.hints:
-            hints = "\n".join(f"- {hint}" for hint in evaluation.hints[:3])
-            lines.extend(["", f"Подсказки на будущее:\n{hints}"])
         if evaluation.usage_example:
             lines.extend(["", f"Пример использования:\n{evaluation.usage_example}"])
         return "\n".join(lines)
