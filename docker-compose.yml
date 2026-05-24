@@ -1,3 +1,4 @@
+
 services:
   bot:
     build:
@@ -8,3 +9,41 @@ services:
     volumes:
       - ./data:/app/data
     restart: unless-stopped
+
+  api:
+    build:
+      context: .
+    container_name: de-interview-api
+    env_file:
+      - .env
+    command: ["python", "-m", "uvicorn", "web.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      EVENTS_POSTGRES_DSN: postgresql://events_user:events_pass@postgres:5432/events
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: de-interview-postgres
+    environment:
+      POSTGRES_DB: events
+      POSTGRES_USER: events_user
+      POSTGRES_PASSWORD: events_pass
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U events_user -d events"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  pg_data:
