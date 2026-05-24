@@ -45,5 +45,81 @@ services:
       retries: 20
     restart: unless-stopped
 
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: de-interview-clickhouse
+    environment:
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: analytics_user
+      CLICKHOUSE_PASSWORD: analytics_pass
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ch_data:/var/lib/clickhouse
+      - ./streaming/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+
+  airflow-webserver:
+    image: apache/airflow:2.10.3
+    container_name: de-interview-airflow-webserver
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      EVENTS_POSTGRES_DSN: postgresql://events_user:events_pass@postgres:5432/events
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "9000"
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: analytics_user
+      CLICKHOUSE_PASSWORD: analytics_pass
+    volumes:
+      - ./streaming/airflow/dags:/opt/airflow/dags
+      - airflow_data:/opt/airflow
+    command: >
+      bash -c "
+      pip install --no-cache-dir psycopg[binary]==3.2.9 clickhouse-driver==0.2.9 &&
+      airflow db migrate &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true &&
+      airflow webserver"
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+
+  airflow-scheduler:
+    image: apache/airflow:2.10.3
+    container_name: de-interview-airflow-scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_started
+    environment:
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/airflow.db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      EVENTS_POSTGRES_DSN: postgresql://events_user:events_pass@postgres:5432/events
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "9000"
+      CLICKHOUSE_DB: analytics
+      CLICKHOUSE_USER: analytics_user
+      CLICKHOUSE_PASSWORD: analytics_pass
+    volumes:
+      - ./streaming/airflow/dags:/opt/airflow/dags
+      - airflow_data:/opt/airflow
+    command: >
+      bash -c "
+      pip install --no-cache-dir psycopg[binary]==3.2.9 clickhouse-driver==0.2.9 &&
+      airflow db migrate &&
+      airflow scheduler"
+    restart: unless-stopped
+
 volumes:
   pg_data:
+  ch_data:
+  airflow_data:
